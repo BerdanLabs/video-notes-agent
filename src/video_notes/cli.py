@@ -4,6 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
+from .exceptions import VideoNotesError
 from .docx_writer import build_docx
 from .qa import check_docx
 from .resolver import resolve_source
@@ -31,10 +32,13 @@ def main() -> None:
     qa.add_argument("docx", type=Path)
 
     args = parser.parse_args()
-    if args.command == "create":
-        run_create(args)
-    elif args.command == "qa":
-        print(json.dumps(check_docx(args.docx), indent=2))
+    try:
+        if args.command == "create":
+            run_create(args)
+        elif args.command == "qa":
+            print(json.dumps(check_docx(args.docx), indent=2))
+    except VideoNotesError as exc:
+        parser.exit(1, f"Error: {exc}\n")
 
 
 def run_create(args: argparse.Namespace) -> None:

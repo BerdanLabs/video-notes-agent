@@ -6,13 +6,14 @@ from pathlib import Path
 
 from PIL import Image
 
+from .exceptions import DependencyMissingError
 from .utils import find_ffmpeg, fmt_time
 
 
 def extract_frames(video: Path, out_dir: Path, interval: int = 30) -> list[Path]:
     ffmpeg = find_ffmpeg()
     if not ffmpeg:
-        raise SystemExit("ffmpeg or imageio-ffmpeg is required to extract frames.")
+        raise DependencyMissingError("ffmpeg or imageio-ffmpeg is required to extract frames.")
     frames = out_dir / "frames"
     frames.mkdir(parents=True, exist_ok=True)
     duration = probe_duration(video)
