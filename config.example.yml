@@ -1,0 +1,9 @@
+profile: course
+whisper_model: small
+language: null
+screenshot_interval: 30
+max_screenshots: 15
+local_only: true
+include_quotes: true
+include_review_questions: true
+output_format: docx

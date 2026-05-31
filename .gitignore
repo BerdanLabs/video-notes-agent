@@ -1,0 +1,24 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Generated note outputs and private media
+output/
+notes/
+course-notes/
+*.mp4
+*.mov
+*.mkv
+*.webm
+*.wav
+*.m4a
+
+# Local secrets/config
+.env
+local.config.yml
