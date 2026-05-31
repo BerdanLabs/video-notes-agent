@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import urlparse
 
+from .exceptions import DependencyMissingError, SourceResolutionError
 from .utils import safe_title
 
 
@@ -25,12 +26,12 @@ def is_url(value: str) -> bool:
 def resolve_source(value: str, out_dir: Path, download: bool = False) -> Source:
     if is_url(value):
         if not download:
-            raise SystemExit("URL input requires --download so access is explicit.")
+            raise SourceResolutionError("URL input requires --download so access is explicit.")
         return download_url(value, out_dir)
 
     path = Path(value).expanduser().resolve()
     if not path.exists():
-        raise SystemExit(f"Video file not found: {path}")
+        raise SourceResolutionError(f"Video file not found: {path}")
     return Source(input=value, path=path, title=safe_title(path.name))
 
 
@@ -38,7 +39,9 @@ def download_url(url: str, out_dir: Path) -> Source:
     try:
         import yt_dlp  # type: ignore
     except ImportError as exc:
-        raise SystemExit("Install URL support with: python -m pip install -e .[download]") from exc
+        raise DependencyMissingError(
+            "Install URL support with: python -m pip install -e .[download]"
+        ) from exc
 
     out_dir.mkdir(parents=True, exist_ok=True)
     template = str(out_dir / "%(title).180s.%(ext)s")

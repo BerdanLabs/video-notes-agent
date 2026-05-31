@@ -4,6 +4,7 @@ import json
 import subprocess
 from pathlib import Path
 
+from .exceptions import DependencyMissingError
 from .utils import find_ffmpeg, fmt_time
 
 
@@ -16,7 +17,7 @@ DEFAULT_PROMPT = (
 def extract_audio(media: Path, out_dir: Path) -> Path:
     ffmpeg = find_ffmpeg()
     if not ffmpeg:
-        raise SystemExit("ffmpeg or imageio-ffmpeg is required to extract audio.")
+        raise DependencyMissingError("ffmpeg or imageio-ffmpeg is required to extract audio.")
     out_dir.mkdir(parents=True, exist_ok=True)
     audio = out_dir / "audio-16khz.wav"
     subprocess.run(
@@ -50,7 +51,9 @@ def transcribe_local(
     try:
         from faster_whisper import WhisperModel
     except ImportError as exc:
-        raise SystemExit("Install local transcription with: python -m pip install faster-whisper") from exc
+        raise DependencyMissingError(
+            "Install local transcription with: python -m pip install faster-whisper"
+        ) from exc
 
     audio = extract_audio(media, out_dir)
     model = WhisperModel(model_size, device="auto", compute_type="auto")
