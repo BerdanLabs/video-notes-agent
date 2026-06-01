@@ -93,6 +93,10 @@ Each run writes a per-video folder containing the notes plus machine-readable ar
 - `webinar`: agenda, main ideas, examples, Q&A, next steps
 - `general`: flexible notes for any video
 
+## Samples
+
+See `docs/samples/` for a tiny synthetic video, generated DOCX/Markdown notes, and JSON artifacts.
+
 ## Privacy
 
 The default transcription path is local open-source Whisper through `faster-whisper`.

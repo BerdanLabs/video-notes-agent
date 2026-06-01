@@ -1,0 +1,14 @@
+{
+  "frame_count": 3,
+  "selected_count": 3,
+  "frames": [
+    "frames/00-00.jpg",
+    "frames/00-01.jpg",
+    "frames/00-02.jpg"
+  ],
+  "selected": [
+    "frames/00-00.jpg",
+    "frames/00-01.jpg",
+    "frames/00-02.jpg"
+  ]
+}
