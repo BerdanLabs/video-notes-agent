@@ -22,6 +22,7 @@ Default workflow:
    - Check `PHP`, `?s`, `?why`, `?poets?`, replacement characters, and internal test sections.
    - Print and review every paragraph containing `PHP` or `?`.
    - Structurally verify paragraphs, headings, tables, and embedded media.
+   - Use `--render-qa` or `video-notes qa --render` when LibreOffice is available.
 6. Inspect JSON artifacts when debugging or chaining agents.
    - `artifacts/source.json` records the resolved source, profile, and sanitized internet retrieval metadata when available.
    - `artifacts/transcript.json` records the transcript segments.

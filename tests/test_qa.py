@@ -29,6 +29,21 @@ def test_check_docx_accepts_normal_questions(tmp_path: Path):
     assert report["problems"] == []
 
 
+def test_check_docx_can_include_render_report(monkeypatch, tmp_path: Path):
+    path = tmp_path / "good.docx"
+    doc = Document()
+    doc.add_paragraph("Why does copywriting matter?")
+    doc.save(path)
+    monkeypatch.setattr(
+        "video_notes.qa.check_docx_render",
+        lambda docx: {"status": "skipped", "problems": ["missing engine"]},
+    )
+
+    report = check_notes(path, render=True)
+
+    assert report["render"]["status"] == "skipped"
+
+
 def test_check_markdown_flags_php_artifact(tmp_path: Path):
     path = tmp_path / "bad.md"
     path.write_text("This line contains a PHP artifact", encoding="utf-8")

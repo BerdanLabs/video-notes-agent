@@ -9,6 +9,7 @@ It turns local or internet-accessible videos into polished study notes with:
 - scene-aware selected screenshots
 - optional OCR for slide, code, and screen text
 - DOCX output
+- optional DOCX render QA through LibreOffice
 - JSON artifacts for agents, audits, and debugging
 - artifact checks for broken punctuation and transcript mistakes
 - agent instructions for Codex, Claude Code, OpenCode, Antigravity-style tools, and other coding agents
@@ -61,6 +62,15 @@ OCR on selected screenshots:
 python -m pip install -e ".[ocr]"
 video-notes create "lesson.mp4" --out ./notes --ocr
 ```
+
+DOCX render QA:
+
+```bash
+video-notes create "lesson.mp4" --out ./notes --render-qa
+video-notes qa "./notes/lesson/lesson Notes.docx" --render
+```
+
+Render QA uses LibreOffice when available and reports a skipped render check when it is not installed.
 
 If a URL cannot be processed, the CLI returns a clear refusal or resolution error for common cases
 such as DRM-protected media, private/login-only videos, removed videos, or unreachable sources.
