@@ -22,5 +22,11 @@ Default workflow:
    - Check `PHP`, `?s`, `?why`, `?poets?`, replacement characters, and internal test sections.
    - Print and review every paragraph containing `PHP` or `?`.
    - Structurally verify paragraphs, headings, tables, and embedded media.
+6. Inspect JSON artifacts when debugging or chaining agents.
+   - `artifacts/source.json` records the resolved source and profile.
+   - `artifacts/transcript.json` records the transcript segments.
+   - `artifacts/screenshots.json` records extracted and selected screenshots.
+   - `artifacts/note_plan.json` records summary bullets, quotes, and planned sections.
+   - `artifacts/outputs.json` records note output paths and QA reports.
 
 Do not include internal implementation notes, model/runtime details, or comparison sections in final DOCX files unless the user explicitly asks for an audit.

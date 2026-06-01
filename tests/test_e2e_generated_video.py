@@ -62,11 +62,27 @@ def test_cli_create_with_generated_video_fixture(tmp_path: Path):
     assert markdown.exists()
     assert payload["docx_qa"]["problems"] == []
     assert payload["markdown_qa"]["problems"] == []
+    assert set(payload["artifacts"]) == {
+        "source",
+        "transcript",
+        "screenshots",
+        "note_plan",
+        "outputs",
+    }
 
     work_dir = output_dir / "fixture"
     frames = sorted((work_dir / "frames").glob("*.jpg"))
     assert frames
     assert (work_dir / "frames.json").exists()
+    for artifact in payload["artifacts"].values():
+        assert (work_dir / artifact).exists()
+
+    screenshots_artifact = json.loads((work_dir / payload["artifacts"]["screenshots"]).read_text())
+    assert screenshots_artifact["frame_count"] >= 1
+    assert screenshots_artifact["selected_count"] >= 1
+
+    outputs_artifact = json.loads((work_dir / payload["artifacts"]["outputs"]).read_text())
+    assert outputs_artifact["docx"]["qa"]["problems"] == []
 
     markdown_text = markdown.read_text(encoding="utf-8")
     assert "# fixture Notes" in markdown_text
