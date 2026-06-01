@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 from .docx_writer import build_docx
+from .markdown_writer import build_markdown
 from .qa import check_docx
 from .resolver import resolve_source
 from .screenshots import extract_frames, select_representative_frames
@@ -26,6 +27,7 @@ def main() -> None:
     create.add_argument("--screenshot-interval", type=int, default=30)
     create.add_argument("--max-screenshots", type=int, default=12)
     create.add_argument("--skip-transcript", action="store_true")
+    create.add_argument("--skip-markdown", action="store_true", help="Skip Markdown notes generation")
 
     qa = sub.add_parser("qa", help="Check a generated DOCX")
     qa.add_argument("docx", type=Path)
@@ -55,6 +57,7 @@ def run_create(args: argparse.Namespace) -> None:
 
     frames = extract_frames(source.path, work, interval=args.screenshot_interval)
     shots = select_representative_frames(frames, max_count=args.max_screenshots)
+    
     docx = build_docx(
         title=f"{title} Notes",
         source=source.source_url or str(source.path),
@@ -63,8 +66,23 @@ def run_create(args: argparse.Namespace) -> None:
         out_path=work / f"{title} Notes.docx",
         profile=args.profile,
     )
+    
+    md_path = None
+    if not args.skip_markdown:
+        md_path = build_markdown(
+            title=f"{title} Notes",
+            source=source.source_url or str(source.path),
+            transcript=transcript,
+            screenshots=shots,
+            out_path=work / f"{title} Notes.md",
+            profile=args.profile,
+        )
+        
     report = check_docx(docx)
-    print(json.dumps({"docx": str(docx), "qa": report}, indent=2))
+    result = {"docx": str(docx), "qa": report}
+    if md_path:
+        result["markdown"] = str(md_path)
+    print(json.dumps(result, indent=2))
 
 
 if __name__ == "__main__":
