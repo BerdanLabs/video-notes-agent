@@ -13,12 +13,7 @@
 
 ## Agent Interop
 
-- Add MCP server exposing:
-  - `resolve_video`
-  - `transcribe_video`
-  - `extract_screenshots`
-  - `create_docx_notes`
-  - `qa_docx`
+- Add narrower MCP tools for source resolution, transcription, and screenshot extraction.
 - Add packaged Codex skill export.
 - Add Claude Code slash command installer.
 

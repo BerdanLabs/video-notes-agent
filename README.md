@@ -36,6 +36,12 @@ For internet video downloads:
 python -m pip install -e ".[download]"
 ```
 
+For MCP server support:
+
+```bash
+python -m pip install -e ".[mcp]"
+```
+
 ## Quick Start
 
 Local video:
@@ -129,9 +135,8 @@ AI coding agents can use:
 - `AGENTS.md` for universal instructions
 - `adapters/codex/SKILL.md` for Codex
 - `adapters/claude/VIDEO_NOTES.md` for Claude Code slash-command style usage
+- `adapters/mcp/README.md` for MCP-compatible agents and desktop clients
 - the `video-notes` CLI for any agent that can run shell commands
-
-Future work: MCP server adapter.
 
 ## Current Limitation
 
