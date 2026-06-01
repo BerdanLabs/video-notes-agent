@@ -66,6 +66,7 @@ def test_cli_create_with_generated_video_fixture(tmp_path: Path):
         "source",
         "transcript",
         "screenshots",
+        "ocr",
         "note_plan",
         "outputs",
     }

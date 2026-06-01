@@ -14,6 +14,7 @@ from .artifacts import (
 )
 from .docx_writer import build_docx
 from .markdown_writer import build_markdown
+from .ocr import extract_ocr_text, skipped_ocr_artifact
 from .qa import check_notes
 from .resolver import resolve_source
 from .screenshots import extract_frames, select_representative_frames
@@ -42,6 +43,7 @@ def main() -> None:
     create.add_argument("--max-screenshots", type=int, default=12)
     create.add_argument("--skip-transcript", action="store_true")
     create.add_argument("--skip-markdown", action="store_true", help="Skip Markdown notes generation")
+    create.add_argument("--ocr", action="store_true", help="Run OCR on selected screenshots")
 
     qa = sub.add_parser("qa", help="Check a generated DOCX or Markdown file")
     qa.add_argument("notes_file", type=Path, help="Path to the generated .docx or .md file")
@@ -79,6 +81,7 @@ def run_create(args: argparse.Namespace) -> None:
 
     frames = extract_frames(source.path, work, interval=args.screenshot_interval)
     shots = select_representative_frames(frames, max_count=args.max_screenshots)
+    ocr_artifact = extract_ocr_text(shots, work) if args.ocr else skipped_ocr_artifact()
     note_plan = build_note_plan(transcript, args.profile)
     
     docx = build_docx(
@@ -119,6 +122,10 @@ def run_create(args: argparse.Namespace) -> None:
         "screenshots": write_json_artifact(
             artifacts_dir / "screenshots.json",
             build_screenshot_artifact(frames, shots, work),
+        ),
+        "ocr": write_json_artifact(
+            artifacts_dir / "ocr.json",
+            ocr_artifact,
         ),
         "note_plan": write_json_artifact(
             artifacts_dir / "note_plan.json",

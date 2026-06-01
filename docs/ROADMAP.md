@@ -4,7 +4,7 @@
 
 - Continue improving transcript-aware synthesis depth and profile-specific phrasing.
 - Add configurable scene-change thresholds and screenshot captions.
-- Add OCR/vision pass for slides and code.
+- Integrate OCR text into DOCX and Markdown synthesis.
 - Add DOCX render QA through LibreOffice or Word automation.
 - Add public sample video and sample DOCX.
 - Expand generated video fixtures with audio and changing scenes.
