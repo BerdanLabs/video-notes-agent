@@ -7,7 +7,7 @@ from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.style import WD_STYLE_TYPE
 
-from .profiles import get_profile
+from .synthesis import build_note_plan
 from .utils import clean_docx_text, fmt_time
 
 
@@ -27,28 +27,24 @@ def build_docx(
     meta.add_run("Source: ").bold = True
     meta.add_run(clean_docx_text(source))
 
+    note_plan = build_note_plan(transcript, profile)
+
     doc.add_heading("Quick Summary", level=1)
-    for bullet in summarize_placeholder(transcript, profile):
+    for bullet in note_plan["summary"]:
         doc.add_paragraph(clean_docx_text(bullet), style="List Bullet")
 
-    quote_candidates = transcript[:]
     doc.add_heading("Memorable Lines", level=1)
-    for segment in select_quote_segments(quote_candidates):
+    for segment in note_plan["quotes"]:
         p = doc.add_paragraph(style="Timestamp Quote")
         p.add_run(f'{fmt_time(segment["start"])} - "{clean_docx_text(segment["text"])}"')
 
     doc.add_heading("Detailed Notes", level=1)
     if screenshots:
         add_screenshot(doc, screenshots[0], "Opening visual from the video.")
-    for heading in get_profile(profile):
-        if heading in {"Quick Summary", "Detailed Notes"}:
-            continue
+    for heading, bullets in note_plan["sections"].items():
         doc.add_heading(heading, level=2)
-        doc.add_paragraph(
-            clean_docx_text(
-                "Use the transcript and visuals to expand this section with human study notes."
-            )
-        )
+        for bullet in bullets:
+            doc.add_paragraph(clean_docx_text(bullet), style="List Bullet")
 
     if screenshots[1:]:
         doc.add_heading("Selected Screenshots", level=1)
@@ -90,19 +86,5 @@ def add_screenshot(doc: Document, path: Path, caption: str) -> None:
     cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
 
-def select_quote_segments(segments: list[dict], limit: int = 8) -> list[dict]:
-    useful = [s for s in segments if 45 <= len(s.get("text", "")) <= 180]
-    if len(useful) <= limit:
-        return useful
-    step = len(useful) / limit
-    return [useful[int(i * step)] for i in range(limit)]
-
-
 def summarize_placeholder(transcript: list[dict], profile: str) -> list[str]:
-    if not transcript:
-        return ["No transcript was available; expand notes from visual inspection."]
-    return [
-        f"This {profile} video was transcribed locally and organized into skimmable notes.",
-        "Review the timestamped quotes and selected screenshots to revisit important moments.",
-        "Expand each section with examples, definitions, warnings, and practical takeaways from the transcript.",
-    ]
+    return build_note_plan(transcript, profile)["summary"]

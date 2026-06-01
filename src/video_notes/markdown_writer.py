@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from .profiles import get_profile
+from .synthesis import build_note_plan
 from .utils import clean_docx_text, fmt_time
 
 
@@ -16,40 +16,33 @@ def build_markdown(
 ) -> Path:
     """Build a beautifully formatted Markdown notes file."""
     lines = []
-    
-    # Title
+    note_plan = build_note_plan(transcript, profile)
+
     lines.append(f"# {title}")
     lines.append("")
-    
-    # Metadata
+
     lines.append(f"**Source:** {source}")
     lines.append("")
-    
-    # Quick Summary
+
     lines.append("## Quick Summary")
     lines.append("")
-    for bullet in summarize_placeholder(transcript, profile):
+    for bullet in note_plan["summary"]:
         lines.append(f"- {bullet}")
     lines.append("")
-    
-    # Memorable Lines (Quotes)
-    quote_candidates = transcript[:]
+
     lines.append("## Memorable Lines")
     lines.append("")
-    for segment in select_quote_segments(quote_candidates):
+    for segment in note_plan["quotes"]:
         time_str = fmt_time(segment["start"])
         clean_text = clean_docx_text(segment["text"])
         lines.append(f'> **{time_str}** - "{clean_text}"')
         lines.append("")
-    
-    # Detailed Notes & Visual Anchors
+
     lines.append("## Detailed Notes")
     lines.append("")
-    
-    # Embedded first screenshot (opening visual)
+
     if screenshots:
         first_shot = screenshots[0]
-        # Use relative path if possible, otherwise absolute
         try:
             rel_path = first_shot.relative_to(out_path.parent)
         except ValueError:
@@ -58,17 +51,14 @@ def build_markdown(
         lines.append("")
         lines.append("*Caption: Opening visual from the video.*")
         lines.append("")
-        
-    # Profile-specific sections
-    for heading in get_profile(profile):
-        if heading in {"Quick Summary", "Detailed Notes"}:
-            continue
+
+    for heading, bullets in note_plan["sections"].items():
         lines.append(f"### {heading}")
         lines.append("")
-        lines.append("Use the transcript and visuals to expand this section with human study notes.")
+        for bullet in bullets:
+            lines.append(f"- {bullet}")
         lines.append("")
-        
-    # Remaining screenshots
+
     if screenshots[1:]:
         lines.append("## Selected Screenshots")
         lines.append("")
@@ -82,27 +72,11 @@ def build_markdown(
             lines.append(f"*Caption: Selected frame at {shot.stem.replace('-', ':')}*")
             lines.append("")
 
-    # Ensure parent directory exists
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    
-    # Save markdown file
+
     out_path.write_text("\n".join(lines), encoding="utf-8")
     return out_path
 
 
-def select_quote_segments(segments: list[dict], limit: int = 8) -> list[dict]:
-    useful = [s for s in segments if 45 <= len(s.get("text", "")) <= 180]
-    if len(useful) <= limit:
-        return useful
-    step = len(useful) / limit
-    return [useful[int(i * step)] for i in range(limit)]
-
-
 def summarize_placeholder(transcript: list[dict], profile: str) -> list[str]:
-    if not transcript:
-        return ["No transcript was available; expand notes from visual inspection."]
-    return [
-        f"This {profile} video was transcribed locally and organized into skimmable notes.",
-        "Review the timestamped quotes and selected screenshots to revisit important moments.",
-        "Expand each section with examples, definitions, warnings, and practical takeaways from the transcript.",
-    ]
+    return build_note_plan(transcript, profile)["summary"]
