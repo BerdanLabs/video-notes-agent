@@ -26,8 +26,6 @@ def test_cli_create_with_generated_video_fixture(tmp_path: Path):
             "lavfi",
             "-i",
             "color=c=navy:s=320x180:d=2",
-            "-vf",
-            "drawtext=text='Video Notes Fixture':fontcolor=white:fontsize=24:x=20:y=80",
             "-pix_fmt",
             "yuv420p",
             str(video),
