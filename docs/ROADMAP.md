@@ -9,6 +9,7 @@
 - Add richer public sample with audio and transcript.
 - Expand generated video fixtures with audio and changing scenes.
 - Version JSON artifact schemas for long-term agent compatibility.
+- Publish the first PyPI release after trusted publishing is configured.
 
 ## Agent Interop
 

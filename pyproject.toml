@@ -8,8 +8,21 @@ version = "0.1.0"
 description = "Local-first video note-taking engine for AI agents and humans."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = "MIT"
 authors = [{ name = "Video Notes Agent contributors" }]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Education",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Multimedia :: Video",
+  "Topic :: Office/Business :: Office Suites",
+]
 dependencies = [
   "faster-whisper>=1.0",
   "imageio-ffmpeg>=0.4",
@@ -21,7 +34,12 @@ dependencies = [
 download = ["yt-dlp>=2025.1.1"]
 ocr = ["pytesseract>=0.3"]
 render = ["pdf2image>=1.17"]
-dev = ["pytest>=8", "ruff>=0.5"]
+dev = ["build>=1.2", "pytest>=8", "ruff>=0.5", "twine>=5"]
+
+[project.urls]
+Homepage = "https://github.com/BerdanLabs/video-notes-agent"
+Repository = "https://github.com/BerdanLabs/video-notes-agent"
+Issues = "https://github.com/BerdanLabs/video-notes-agent/issues"
 
 [project.scripts]
 video-notes = "video_notes.cli:main"

@@ -24,6 +24,12 @@ Early open-source scaffold. The core package and CLI are being split out from a 
 python -m pip install -e .
 ```
 
+After the first PyPI release:
+
+```bash
+python -m pip install video-notes-agent
+```
+
 For internet video downloads:
 
 ```bash
@@ -96,6 +102,10 @@ Each run writes a per-video folder containing the notes plus machine-readable ar
 ## Samples
 
 See `docs/samples/` for a tiny synthetic video, generated DOCX/Markdown notes, and JSON artifacts.
+
+## Releasing
+
+Release instructions live in `docs/RELEASING.md`.
 
 ## Privacy
 
