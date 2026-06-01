@@ -7,6 +7,7 @@ It turns local or internet-accessible videos into polished study notes with:
 - local Whisper transcription by default
 - timestamped quotes
 - scene-aware selected screenshots
+- optional OCR for slide, code, and screen text
 - DOCX output
 - JSON artifacts for agents, audits, and debugging
 - artifact checks for broken punctuation and transcript mistakes
@@ -54,6 +55,13 @@ Authorized session with exported cookies:
 video-notes create "https://example.com/private-lesson" --download --cookies ./cookies.txt
 ```
 
+OCR on selected screenshots:
+
+```bash
+python -m pip install -e ".[ocr]"
+video-notes create "lesson.mp4" --out ./notes --ocr
+```
+
 If a URL cannot be processed, the CLI returns a clear refusal or resolution error for common cases
 such as DRM-protected media, private/login-only videos, removed videos, or unreachable sources.
 
@@ -62,6 +70,7 @@ Each run writes a per-video folder containing the notes plus machine-readable ar
 - `artifacts/source.json`: input, resolved video path, title, URL, selected profile, and sanitized retrieval metadata for downloaded videos
 - `artifacts/transcript.json`: normalized transcript segments used for note generation
 - `artifacts/screenshots.json`: extracted frames and selected screenshots
+- `artifacts/ocr.json`: OCR text from selected screenshots when `--ocr` is enabled
 - `artifacts/note_plan.json`: generated summary, quotes, and section plan
 - `artifacts/outputs.json`: output paths and QA reports
 

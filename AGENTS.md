@@ -26,6 +26,7 @@ Default workflow:
    - `artifacts/source.json` records the resolved source, profile, and sanitized internet retrieval metadata when available.
    - `artifacts/transcript.json` records the transcript segments.
    - `artifacts/screenshots.json` records extracted and selected screenshots.
+   - `artifacts/ocr.json` records screen text when OCR is enabled.
    - `artifacts/note_plan.json` records summary bullets, quotes, and planned sections.
    - `artifacts/outputs.json` records note output paths and QA reports.
 
