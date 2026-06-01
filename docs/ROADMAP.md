@@ -24,6 +24,6 @@
 ## Internet Video Support
 
 - Harden `yt-dlp` URL resolution.
-- Add cookie-file option for user-authorized sessions.
+- Add browser cookie import helpers for user-authorized sessions.
 - Expand retrieval metadata with schema versioning and optional provenance checks.
 - Expand DRM/access-control refusal tests with real extractor error fixtures.

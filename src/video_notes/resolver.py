@@ -23,11 +23,16 @@ def is_url(value: str) -> bool:
     return parsed.scheme in {"http", "https"}
 
 
-def resolve_source(value: str, out_dir: Path, download: bool = False) -> Source:
+def resolve_source(
+    value: str,
+    out_dir: Path,
+    download: bool = False,
+    cookies: Path | None = None,
+) -> Source:
     if is_url(value):
         if not download:
             raise SourceResolutionError("URL input requires --download so access is explicit.")
-        return download_url(value, out_dir)
+        return download_url(value, out_dir, cookies=cookies)
 
     path = Path(value).expanduser().resolve()
     if not path.exists():
@@ -35,7 +40,7 @@ def resolve_source(value: str, out_dir: Path, download: bool = False) -> Source:
     return Source(input=value, path=path, title=safe_title(path.name))
 
 
-def download_url(url: str, out_dir: Path) -> Source:
+def download_url(url: str, out_dir: Path, cookies: Path | None = None) -> Source:
     try:
         import yt_dlp  # type: ignore
     except ImportError as exc:
@@ -44,14 +49,7 @@ def download_url(url: str, out_dir: Path) -> Source:
         ) from exc
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    template = str(out_dir / "%(title).180s.%(ext)s")
-    opts = {
-        "outtmpl": template,
-        "format": "bv*+ba/best",
-        "merge_output_format": "mp4",
-        "quiet": True,
-        "no_warnings": True,
-    }
+    opts = build_download_options(out_dir, cookies=cookies)
     try:
         with yt_dlp.YoutubeDL(opts) as ydl:
             info = ydl.extract_info(url, download=True)
@@ -70,6 +68,22 @@ def download_url(url: str, out_dir: Path) -> Source:
         source_url=url,
         retrieval_metadata=extract_retrieval_metadata(info),
     )
+
+
+def build_download_options(out_dir: Path, cookies: Path | None = None) -> dict[str, Any]:
+    opts: dict[str, Any] = {
+        "outtmpl": str(out_dir / "%(title).180s.%(ext)s"),
+        "format": "bv*+ba/best",
+        "merge_output_format": "mp4",
+        "quiet": True,
+        "no_warnings": True,
+    }
+    if cookies:
+        cookie_file = cookies.expanduser().resolve()
+        if not cookie_file.exists():
+            raise SourceResolutionError(f"Cookie file not found: {cookie_file}")
+        opts["cookiefile"] = str(cookie_file)
+    return opts
 
 
 def classify_download_error(url: str, exc: Exception) -> str:
