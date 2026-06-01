@@ -48,6 +48,9 @@ Internet video:
 video-notes create "https://www.youtube.com/watch?v=..." --out ./notes --profile tutorial --download
 ```
 
+If a URL cannot be processed, the CLI returns a clear refusal or resolution error for common cases
+such as DRM-protected media, private/login-only videos, removed videos, or unreachable sources.
+
 Each run writes a per-video folder containing the notes plus machine-readable artifacts:
 
 - `artifacts/source.json`: input, resolved video path, title, URL, selected profile, and sanitized retrieval metadata for downloaded videos

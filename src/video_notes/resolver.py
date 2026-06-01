@@ -52,14 +52,17 @@ def download_url(url: str, out_dir: Path) -> Source:
         "quiet": True,
         "no_warnings": True,
     }
-    with yt_dlp.YoutubeDL(opts) as ydl:
-        info = ydl.extract_info(url, download=True)
-        title = info.get("title") or safe_title(url)
-        path = Path(ydl.prepare_filename(info))
-        if path.suffix != ".mp4":
-            merged = path.with_suffix(".mp4")
-            if merged.exists():
-                path = merged
+    try:
+        with yt_dlp.YoutubeDL(opts) as ydl:
+            info = ydl.extract_info(url, download=True)
+            title = info.get("title") or safe_title(url)
+            path = Path(ydl.prepare_filename(info))
+            if path.suffix != ".mp4":
+                merged = path.with_suffix(".mp4")
+                if merged.exists():
+                    path = merged
+    except Exception as exc:
+        raise SourceResolutionError(classify_download_error(url, exc)) from exc
     return Source(
         input=url,
         path=path.resolve(),
@@ -67,6 +70,38 @@ def download_url(url: str, out_dir: Path) -> Source:
         source_url=url,
         retrieval_metadata=extract_retrieval_metadata(info),
     )
+
+
+def classify_download_error(url: str, exc: Exception) -> str:
+    detail = str(exc).strip()
+    lowered = detail.lower()
+
+    if any(term in lowered for term in ("drm", "encrypted", "protected content")):
+        reason = "This video appears to be DRM-protected, so video-notes-agent will not try to bypass it."
+    elif any(
+        term in lowered
+        for term in (
+            "private",
+            "sign in",
+            "login",
+            "forbidden",
+            "unauthorized",
+            "403",
+            "cookies",
+        )
+    ):
+        reason = (
+            "This video is not accessible without authorization. Use only accounts and videos "
+            "you have permission to process."
+        )
+    elif any(term in lowered for term in ("not available", "unavailable", "removed", "404")):
+        reason = "This video is unavailable, removed, region-blocked, or the URL is incorrect."
+    else:
+        reason = "The video could not be downloaded."
+
+    if detail:
+        return f"{reason} Source: {url}. Downloader detail: {detail}"
+    return f"{reason} Source: {url}."
 
 
 def extract_retrieval_metadata(info: dict[str, Any]) -> dict[str, Any]:
