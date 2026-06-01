@@ -25,5 +25,5 @@
 
 - Harden `yt-dlp` URL resolution.
 - Add cookie-file option for user-authorized sessions.
-- Store retrieval metadata.
+- Expand retrieval metadata with schema versioning and optional provenance checks.
 - Add clear DRM/access-control refusal messages.

@@ -21,13 +21,16 @@ def relative_path(path: Path, root: Path) -> str:
 
 
 def build_source_artifact(source: Source, work_dir: Path, profile: str) -> dict[str, Any]:
-    return {
+    payload = {
         "input": source.input,
         "title": source.title,
         "profile": profile,
         "source_url": source.source_url,
         "resolved_path": relative_path(source.path, work_dir),
     }
+    if source.retrieval_metadata:
+        payload["retrieval_metadata"] = source.retrieval_metadata
+    return payload
 
 
 def build_screenshot_artifact(

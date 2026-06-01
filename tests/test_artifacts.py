@@ -1,11 +1,13 @@
 from pathlib import Path
 
 from video_notes.artifacts import (
+    build_source_artifact,
     build_outputs_artifact,
     build_screenshot_artifact,
     relative_path,
     write_json_artifact,
 )
+from video_notes.resolver import Source
 
 
 def test_write_json_artifact_creates_parent_directory(tmp_path: Path):
@@ -53,3 +55,18 @@ def test_outputs_artifact_includes_qa_reports(tmp_path: Path):
     assert payload["docx"]["qa"]["problems"] == []
     assert payload["markdown"]["path"] == "Lesson Notes.md"
     assert payload["markdown"]["qa"]["problems"] == ["missing screenshot"]
+
+
+def test_source_artifact_includes_retrieval_metadata(tmp_path: Path):
+    source = Source(
+        input="https://example.com/video",
+        path=tmp_path / "download.mp4",
+        title="Downloaded Lesson",
+        source_url="https://example.com/video",
+        retrieval_metadata={"extractor": "generic", "duration": 42},
+    )
+
+    payload = build_source_artifact(source, tmp_path, "tutorial")
+
+    assert payload["source_url"] == "https://example.com/video"
+    assert payload["retrieval_metadata"] == {"extractor": "generic", "duration": 42}
