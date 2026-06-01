@@ -1,0 +1,22 @@
+{
+  "docx": {
+    "path": "sample video Notes.docx",
+    "qa": {
+      "paragraphs": 16,
+      "headings": 7,
+      "tables": 0,
+      "images": 3,
+      "problems": []
+    }
+  },
+  "markdown": {
+    "path": "sample video Notes.md",
+    "qa": {
+      "paragraphs": 8,
+      "headings": 8,
+      "tables": 0,
+      "images": 3,
+      "problems": []
+    }
+  }
+}
