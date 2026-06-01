@@ -5,11 +5,19 @@ import json
 from pathlib import Path
 
 from .exceptions import VideoNotesError
+from .artifacts import (
+    build_outputs_artifact,
+    build_screenshot_artifact,
+    build_source_artifact,
+    relative_path,
+    write_json_artifact,
+)
 from .docx_writer import build_docx
 from .markdown_writer import build_markdown
 from .qa import check_notes
 from .resolver import resolve_source
 from .screenshots import extract_frames, select_representative_frames
+from .synthesis import build_note_plan
 from .transcribe import transcribe_local
 from .utils import safe_title
 
@@ -61,6 +69,7 @@ def run_create(args: argparse.Namespace) -> None:
 
     frames = extract_frames(source.path, work, interval=args.screenshot_interval)
     shots = select_representative_frames(frames, max_count=args.max_screenshots)
+    note_plan = build_note_plan(transcript, args.profile)
     
     docx = build_docx(
         title=f"{title} Notes",
@@ -83,13 +92,41 @@ def run_create(args: argparse.Namespace) -> None:
         )
         
     docx_report = check_notes(docx)
+    md_report = None
+    if md_path:
+        md_report = check_notes(md_path)
+
+    artifacts_dir = work / "artifacts"
+    artifact_paths = {
+        "source": write_json_artifact(
+            artifacts_dir / "source.json",
+            build_source_artifact(source, work, args.profile),
+        ),
+        "transcript": write_json_artifact(
+            artifacts_dir / "transcript.json",
+            {"segments": transcript, "segment_count": len(transcript)},
+        ),
+        "screenshots": write_json_artifact(
+            artifacts_dir / "screenshots.json",
+            build_screenshot_artifact(frames, shots, work),
+        ),
+        "note_plan": write_json_artifact(
+            artifacts_dir / "note_plan.json",
+            note_plan,
+        ),
+        "outputs": write_json_artifact(
+            artifacts_dir / "outputs.json",
+            build_outputs_artifact(work, docx, docx_report, md_path, md_report),
+        ),
+    }
+
     result = {
         "docx": str(docx),
-        "docx_qa": docx_report
+        "docx_qa": docx_report,
+        "artifacts": {name: relative_path(path, work) for name, path in artifact_paths.items()},
     }
     
     if md_path:
-        md_report = check_notes(md_path)
         result["markdown"] = str(md_path)
         result["markdown_qa"] = md_report
         

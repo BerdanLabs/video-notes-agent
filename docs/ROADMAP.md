@@ -2,12 +2,13 @@
 
 ## Near Term
 
-- Replace placeholder note synthesis with a richer transcript-aware synthesis engine.
+- Continue improving transcript-aware synthesis depth and profile-specific phrasing.
 - Add scene-change screenshot selection.
 - Add OCR/vision pass for slides and code.
 - Add DOCX render QA through LibreOffice or Word automation.
 - Add public sample video and sample DOCX.
-- Add tests with a tiny generated video fixture.
+- Expand generated video fixtures with audio and changing scenes.
+- Version JSON artifact schemas for long-term agent compatibility.
 
 ## Agent Interop
 

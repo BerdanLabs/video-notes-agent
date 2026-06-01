@@ -8,6 +8,7 @@ It turns local or internet-accessible videos into polished study notes with:
 - timestamped quotes
 - selected screenshots
 - DOCX output
+- JSON artifacts for agents, audits, and debugging
 - artifact checks for broken punctuation and transcript mistakes
 - agent instructions for Codex, Claude Code, OpenCode, Antigravity-style tools, and other coding agents
 
@@ -46,6 +47,14 @@ Internet video:
 ```bash
 video-notes create "https://www.youtube.com/watch?v=..." --out ./notes --profile tutorial --download
 ```
+
+Each run writes a per-video folder containing the notes plus machine-readable artifacts:
+
+- `artifacts/source.json`: input, resolved video path, title, URL, and selected profile
+- `artifacts/transcript.json`: normalized transcript segments used for note generation
+- `artifacts/screenshots.json`: extracted frames and selected screenshots
+- `artifacts/note_plan.json`: generated summary, quotes, and section plan
+- `artifacts/outputs.json`: output paths and QA reports
 
 ## Profiles
 
