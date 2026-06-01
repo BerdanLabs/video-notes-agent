@@ -3,7 +3,12 @@ from pathlib import Path
 import pytest
 
 from video_notes.exceptions import SourceResolutionError
-from video_notes.resolver import extract_retrieval_metadata, is_url, resolve_source
+from video_notes.resolver import (
+    classify_download_error,
+    extract_retrieval_metadata,
+    is_url,
+    resolve_source,
+)
 
 
 def test_is_url_accepts_http_and_https_only():
@@ -70,3 +75,20 @@ def test_extract_retrieval_metadata_keeps_auditable_fields():
     }
     assert "formats" not in metadata
     assert "automatic_captions" not in metadata
+
+
+@pytest.mark.parametrize(
+    ("message", "expected"),
+    [
+        ("This content is DRM protected", "DRM-protected"),
+        ("HTTP Error 403: Forbidden", "not accessible without authorization"),
+        ("Video unavailable", "unavailable"),
+        ("network reset", "could not be downloaded"),
+    ],
+)
+def test_classify_download_error_gives_clear_user_message(message: str, expected: str):
+    result = classify_download_error("https://example.com/video", RuntimeError(message))
+
+    assert expected in result
+    assert "https://example.com/video" in result
+    assert message in result
