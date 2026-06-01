@@ -31,3 +31,47 @@ def check_docx(path: Path) -> dict:
         "images": len(images),
         "problems": problems,
     }
+
+
+def check_markdown(path: Path) -> dict:
+    """Validate generated Markdown files for typical QA issues."""
+    text = path.read_text(encoding="utf-8")
+    lines = text.splitlines()
+    
+    paragraphs = 0
+    headings = 0
+    images = 0
+    problems = []
+    
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if stripped.startswith("#"):
+            headings += 1
+        elif stripped.startswith("!["):
+            images += 1
+        else:
+            paragraphs += 1
+            
+        if "PHP" in line and not any(ch.isdigit() for ch in line):
+            problems.append(f"Suspicious PHP artifact: {line[:120]}")
+            
+    for pattern in BAD_PATTERNS + INTERNAL_PATTERNS:
+        if pattern in text:
+            problems.append(f"Found suspicious pattern: {pattern}")
+            
+    return {
+        "paragraphs": paragraphs,
+        "headings": headings,
+        "tables": 0,
+        "images": images,
+        "problems": problems,
+    }
+
+
+def check_notes(path: Path) -> dict:
+    """Check a generated note file (DOCX or Markdown) using the appropriate parser."""
+    if path.suffix.lower() == ".md":
+        return check_markdown(path)
+    return check_docx(path)
