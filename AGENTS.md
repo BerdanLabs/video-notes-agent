@@ -23,7 +23,7 @@ Default workflow:
    - Print and review every paragraph containing `PHP` or `?`.
    - Structurally verify paragraphs, headings, tables, and embedded media.
 6. Inspect JSON artifacts when debugging or chaining agents.
-   - `artifacts/source.json` records the resolved source and profile.
+   - `artifacts/source.json` records the resolved source, profile, and sanitized internet retrieval metadata when available.
    - `artifacts/transcript.json` records the transcript segments.
    - `artifacts/screenshots.json` records extracted and selected screenshots.
    - `artifacts/note_plan.json` records summary bullets, quotes, and planned sections.

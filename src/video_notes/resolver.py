@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-import json
-import subprocess
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 from urllib.parse import urlparse
 
 from .exceptions import DependencyMissingError, SourceResolutionError
@@ -16,6 +15,7 @@ class Source:
     path: Path
     title: str
     source_url: str | None = None
+    retrieval_metadata: dict[str, Any] | None = None
 
 
 def is_url(value: str) -> bool:
@@ -60,4 +60,29 @@ def download_url(url: str, out_dir: Path) -> Source:
             merged = path.with_suffix(".mp4")
             if merged.exists():
                 path = merged
-    return Source(input=url, path=path.resolve(), title=safe_title(title), source_url=url)
+    return Source(
+        input=url,
+        path=path.resolve(),
+        title=safe_title(title),
+        source_url=url,
+        retrieval_metadata=extract_retrieval_metadata(info),
+    )
+
+
+def extract_retrieval_metadata(info: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "extractor": info.get("extractor"),
+        "extractor_key": info.get("extractor_key"),
+        "id": info.get("id"),
+        "webpage_url": info.get("webpage_url") or info.get("original_url"),
+        "original_url": info.get("original_url"),
+        "title": info.get("title"),
+        "duration": info.get("duration"),
+        "upload_date": info.get("upload_date"),
+        "channel": info.get("channel") or info.get("uploader"),
+        "channel_id": info.get("channel_id") or info.get("uploader_id"),
+        "license": info.get("license"),
+        "format_id": info.get("format_id"),
+        "ext": info.get("ext"),
+        "filesize_approx": info.get("filesize_approx"),
+    }

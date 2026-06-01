@@ -50,7 +50,7 @@ video-notes create "https://www.youtube.com/watch?v=..." --out ./notes --profile
 
 Each run writes a per-video folder containing the notes plus machine-readable artifacts:
 
-- `artifacts/source.json`: input, resolved video path, title, URL, and selected profile
+- `artifacts/source.json`: input, resolved video path, title, URL, selected profile, and sanitized retrieval metadata for downloaded videos
 - `artifacts/transcript.json`: normalized transcript segments used for note generation
 - `artifacts/screenshots.json`: extracted frames and selected screenshots
 - `artifacts/note_plan.json`: generated summary, quotes, and section plan
@@ -69,6 +69,10 @@ Each run writes a per-video folder containing the notes plus machine-readable ar
 
 The default transcription path is local open-source Whisper through `faster-whisper`.
 No OpenAI API key is required for normal use.
+
+Downloaded-video metadata is intentionally sanitized. The source artifact keeps audit-friendly fields
+such as extractor, source URL, duration, channel, license, and format id, but does not store bulky raw
+extractor payloads or signed media URLs.
 
 ## Copyright
 
