@@ -6,7 +6,7 @@ It turns local or internet-accessible videos into polished study notes with:
 
 - local Whisper transcription by default
 - timestamped quotes
-- selected screenshots
+- scene-aware selected screenshots
 - DOCX output
 - JSON artifacts for agents, audits, and debugging
 - artifact checks for broken punctuation and transcript mistakes

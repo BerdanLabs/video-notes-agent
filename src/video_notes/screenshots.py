@@ -70,5 +70,57 @@ def normalize_image(path: Path) -> None:
 def select_representative_frames(frames: list[Path], max_count: int = 12) -> list[Path]:
     if len(frames) <= max_count:
         return frames
+    scored = score_scene_changes(frames)
+    if not scored:
+        return select_evenly_spaced_frames(frames, max_count=max_count)
+
+    chosen = {0}
+    ranked = sorted(scored, key=lambda item: item[1], reverse=True)
+    for idx, score in ranked:
+        if len(chosen) >= max_count:
+            break
+        if score > 0:
+            chosen.add(idx)
+
+    if len(chosen) < max_count:
+        for frame in select_evenly_spaced_frames(frames, max_count=max_count):
+            chosen.add(frames.index(frame))
+            if len(chosen) >= max_count:
+                break
+
+    return [frames[idx] for idx in sorted(chosen)]
+
+
+def select_evenly_spaced_frames(frames: list[Path], max_count: int = 12) -> list[Path]:
+    if len(frames) <= max_count:
+        return frames
     step = len(frames) / max_count
     return [frames[int(i * step)] for i in range(max_count)]
+
+
+def score_scene_changes(frames: list[Path]) -> list[tuple[int, float]]:
+    scores: list[tuple[int, float]] = []
+    previous = None
+    for idx, frame in enumerate(frames):
+        signature = image_signature(frame)
+        if signature is None:
+            return []
+        if previous is not None:
+            scores.append((idx, signature_distance(previous, signature)))
+        previous = signature
+    return scores
+
+
+def image_signature(path: Path) -> list[int] | None:
+    try:
+        with Image.open(path) as img:
+            gray = img.convert("L").resize((8, 8))
+            return list(gray.getdata())
+    except OSError:
+        return None
+
+
+def signature_distance(first: list[int], second: list[int]) -> float:
+    if len(first) != len(second):
+        return 0.0
+    return sum(abs(a - b) for a, b in zip(first, second)) / len(first)
