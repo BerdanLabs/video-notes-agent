@@ -44,16 +44,18 @@ def main() -> None:
     create.add_argument("--skip-transcript", action="store_true")
     create.add_argument("--skip-markdown", action="store_true", help="Skip Markdown notes generation")
     create.add_argument("--ocr", action="store_true", help="Run OCR on selected screenshots")
+    create.add_argument("--render-qa", action="store_true", help="Run optional DOCX render QA")
 
     qa = sub.add_parser("qa", help="Check a generated DOCX or Markdown file")
     qa.add_argument("notes_file", type=Path, help="Path to the generated .docx or .md file")
+    qa.add_argument("--render", action="store_true", help="Run optional DOCX render QA")
 
     args = parser.parse_args()
     try:
         if args.command == "create":
             run_create(args)
         elif args.command == "qa":
-            print(json.dumps(check_notes(args.notes_file), indent=2))
+            print(json.dumps(check_notes(args.notes_file, render=args.render), indent=2))
     except VideoNotesError as exc:
         parser.exit(1, f"Error: {exc}\n")
 
@@ -104,7 +106,7 @@ def run_create(args: argparse.Namespace) -> None:
             profile=args.profile,
         )
         
-    docx_report = check_notes(docx)
+    docx_report = check_notes(docx, render=args.render_qa)
     md_report = None
     if md_path:
         md_report = check_notes(md_path)

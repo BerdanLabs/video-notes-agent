@@ -5,12 +5,14 @@ from zipfile import ZipFile
 
 from docx import Document
 
+from .render_qa import check_docx_render
+
 
 BAD_PATTERNS = ["?s", "?why", "?poets?", "?killers?", "\ufffd"]
 INTERNAL_PATTERNS = ["What Improved", "Comparison With", "Coverage note", "QA caveat"]
 
 
-def check_docx(path: Path) -> dict:
+def check_docx(path: Path, render: bool = False) -> dict:
     doc = Document(path)
     paragraphs = [p.text for p in doc.paragraphs if p.text.strip()]
     table_text = [cell.text for t in doc.tables for row in t.rows for cell in row.cells]
@@ -24,13 +26,16 @@ def check_docx(path: Path) -> dict:
     for line in text.splitlines():
         if "PHP" in line and not any(ch.isdigit() for ch in line):
             problems.append(f"Suspicious PHP artifact: {line[:120]}")
-    return {
+    report = {
         "paragraphs": len(paragraphs),
         "headings": len([p for p in doc.paragraphs if p.style.name.startswith("Heading")]),
         "tables": len(doc.tables),
         "images": len(images),
         "problems": problems,
     }
+    if render:
+        report["render"] = check_docx_render(path)
+    return report
 
 
 def check_markdown(path: Path) -> dict:
@@ -70,8 +75,8 @@ def check_markdown(path: Path) -> dict:
     }
 
 
-def check_notes(path: Path) -> dict:
+def check_notes(path: Path, render: bool = False) -> dict:
     """Check a generated note file (DOCX or Markdown) using the appropriate parser."""
     if path.suffix.lower() == ".md":
         return check_markdown(path)
-    return check_docx(path)
+    return check_docx(path, render=render)

@@ -17,6 +17,14 @@ def find_ffmpeg() -> str | None:
         return None
 
 
+def find_libreoffice() -> str | None:
+    for command in ("soffice", "libreoffice"):
+        found = shutil.which(command)
+        if found:
+            return found
+    return None
+
+
 def safe_title(value: str, fallback: str = "Untitled Video") -> str:
     title = Path(value).stem if value else fallback
     title = re.sub(r"[_-]+", " ", title)
