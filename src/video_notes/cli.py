@@ -33,6 +33,11 @@ def main() -> None:
     create.add_argument("--model-size", default="small")
     create.add_argument("--language")
     create.add_argument("--download", action="store_true")
+    create.add_argument(
+        "--cookies",
+        type=Path,
+        help="Path to a Netscape cookies.txt file for videos you are authorized to access",
+    )
     create.add_argument("--screenshot-interval", type=int, default=30)
     create.add_argument("--max-screenshots", type=int, default=12)
     create.add_argument("--skip-transcript", action="store_true")
@@ -53,7 +58,12 @@ def main() -> None:
 
 def run_create(args: argparse.Namespace) -> None:
     source_tmp = args.out / "_sources"
-    source = resolve_source(args.source, source_tmp, download=args.download)
+    source = resolve_source(
+        args.source,
+        source_tmp,
+        download=args.download,
+        cookies=args.cookies,
+    )
     title = safe_title(source.title)
     work = args.out / title
     work.mkdir(parents=True, exist_ok=True)

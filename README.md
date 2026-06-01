@@ -48,6 +48,12 @@ Internet video:
 video-notes create "https://www.youtube.com/watch?v=..." --out ./notes --profile tutorial --download
 ```
 
+Authorized session with exported cookies:
+
+```bash
+video-notes create "https://example.com/private-lesson" --download --cookies ./cookies.txt
+```
+
 If a URL cannot be processed, the CLI returns a clear refusal or resolution error for common cases
 such as DRM-protected media, private/login-only videos, removed videos, or unreachable sources.
 
@@ -75,7 +81,7 @@ No OpenAI API key is required for normal use.
 
 Downloaded-video metadata is intentionally sanitized. The source artifact keeps audit-friendly fields
 such as extractor, source URL, duration, channel, license, and format id, but does not store bulky raw
-extractor payloads or signed media URLs.
+extractor payloads, signed media URLs, or cookie contents.
 
 ## Copyright
 

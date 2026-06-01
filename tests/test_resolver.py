@@ -4,6 +4,7 @@ import pytest
 
 from video_notes.exceptions import SourceResolutionError
 from video_notes.resolver import (
+    build_download_options,
     classify_download_error,
     extract_retrieval_metadata,
     is_url,
@@ -33,6 +34,21 @@ def test_resolve_source_local_file(tmp_path: Path):
 def test_resolve_source_requires_explicit_download_for_urls(tmp_path: Path):
     with pytest.raises(SourceResolutionError, match="requires --download"):
         resolve_source("https://example.com/video", tmp_path)
+
+
+def test_build_download_options_accepts_cookie_file(tmp_path: Path):
+    cookies = tmp_path / "cookies.txt"
+    cookies.write_text("# Netscape HTTP Cookie File\n", encoding="utf-8")
+
+    opts = build_download_options(tmp_path / "downloads", cookies=cookies)
+
+    assert opts["cookiefile"] == str(cookies.resolve())
+    assert opts["outtmpl"].endswith("%(title).180s.%(ext)s")
+
+
+def test_build_download_options_rejects_missing_cookie_file(tmp_path: Path):
+    with pytest.raises(SourceResolutionError, match="Cookie file not found"):
+        build_download_options(tmp_path / "downloads", cookies=tmp_path / "missing.txt")
 
 
 def test_extract_retrieval_metadata_keeps_auditable_fields():
